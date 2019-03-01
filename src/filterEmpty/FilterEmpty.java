@@ -3,7 +3,6 @@ package filterEmpty;
 import java.util.Arrays;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveAction;
-import java.util.concurrent.RecursiveTask;
 
 
 public class FilterEmpty {
@@ -19,11 +18,13 @@ public class FilterEmpty {
     }
 
     public static int[] mapToBitSet(String[] arr) {
-        return POOL.invoke(new MapToBitTask(arr, new int[arr.length], 0, arr.length));
+    	int[] bitsum = new int[arr.length];
+        POOL.invoke(new MapToBitTask(arr, bitsum, 0, arr.length));
+        return bitsum;
     }
     
     @SuppressWarnings("serial")
-	private static class MapToBitTask extends RecursiveTask<int[]> {
+	private static class MapToBitTask extends RecursiveAction {
         int[] out; String[] in;
         int lo, hi;
         
@@ -35,14 +36,13 @@ public class FilterEmpty {
         }
         
         @Override
-        protected int[] compute() {
+        protected void compute() {
             if (hi - lo <= 1) {
                 for (int i = lo; i < hi; i++) {
                 	if (in[i].length() > 0) {
                 		out[i] = 1;
                 	} // else, out[i] = 0, by default
                 }
-                return out;
             }
 
             int mid = lo + (hi - lo) / 2;
@@ -53,50 +53,48 @@ public class FilterEmpty {
             left.fork();
             right.compute();
             left.join();
-
-            return out;
         }
-        
     }
     
     public static int[] mapToOutput(String[] input, int[] bitsum) {
-        return POOL.invoke(new MapToOutTask(input, bitsum, new int[bitsum[bitsum.length - 1]], 0, bitsum.length));
+        int[] out = new int[bitsum[bitsum.length] - 1];
+        POOL.invoke(new MapToOutTask(input, bitsum, 0, input.length));
+        return out;
     }
     
     @SuppressWarnings("serial")
-	private static class MapToOutTask extends RecursiveTask<int[]> {
+	private static class MapToOutTask extends RecursiveAction {
         int[] out; String[] in; int[] bit;
         int lo, hi;
         
-        public MapToOutTask(String[] in, int[] bit, int[] out, int lo, int hi) {
+        public MapToOutTask(String[] in, int[] bit, int lo, int hi) {
             this.in = in;
-            this.out = out;
             this.lo = lo;
             this.hi = hi;
             this.bit = bit;
         }
         
         @Override
-        protected int[] compute() {
+        protected void compute() {
             if (hi - lo <= 2) {
-                for (int i = lo + 1; i < hi; i++) {
-                	if (bit[i] - bit[i - 1] > 0) {
-                		out[i] = in[i - 1].length();
-                	} 
+                for (int i = lo; i < hi; i++) {
+                	if (i == 0 && bit[i] != 0) {
+                		out[i] = in[i].length(); 
+                	} else if (i > 0 && bit[i] - bit[i - 1] > 0) {
+                		out[i] = in[i].length();
+                	}
                 }
-                return out;
             }
 
             int mid = lo + (hi - lo) / 2;
 
-            MapToOutTask left = new MapToOutTask(in, bit, out, lo, mid);
-            MapToOutTask right = new MapToOutTask(in, bit, out, mid, hi);
+            MapToOutTask left = new MapToOutTask(in, bit, lo, mid);
+            MapToOutTask right = new MapToOutTask(in, bit, mid, hi);
             
             left.fork();
             right.compute();
             left.join();
 
-            return out;
         }
         
     }
