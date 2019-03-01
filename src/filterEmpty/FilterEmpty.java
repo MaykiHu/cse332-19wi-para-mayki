@@ -55,7 +55,7 @@ public class FilterEmpty {
     }
     
     public static int[] mapToOutput(String[] input, int[] bitsum) {
-        int[] out = new int[bitsum[bitsum.length] - 1];
+        int[] out = new int[bitsum[bitsum.length - 1]];
         POOL.invoke(new MapToOutTask(input, bitsum, 0, input.length));
         return out;
     }
