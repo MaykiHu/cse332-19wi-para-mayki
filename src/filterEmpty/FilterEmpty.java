@@ -37,7 +37,7 @@ public class FilterEmpty {
         
         @Override
         protected void compute() {
-            if (hi - lo <= 0) {
+            if (hi - lo <= 1) {
                	if (in[lo].length() > 0) {
                 	out[lo] = 1;
                 } // else, out[i] = 0, by default
@@ -76,15 +76,15 @@ public class FilterEmpty {
         protected void compute() {
             if (hi - lo <= 1) {
                 if (lo == 0 && bit[lo] != 0) {
-                	out[lo] = in[lo].length(); 
-               	} else if (lo > 0 && bit[hi] - bit[lo] > 0) {
-               		out[lo] = in[lo].length();
-               	}
+                	out[lo] = in[lo].length();
+                } else if (lo > 0 && bit[lo] - bit[lo - 1] != 0) {
+                	out[lo] = in[lo].length();
+                }
             } else {
 	            int mid = lo + (hi - lo) / 2;
 	
-	            MapToOutTask left = new MapToOutTask(in, bit, lo, mid);
-	            MapToOutTask right = new MapToOutTask(in, bit, mid, hi);
+	            MapToOutTask left = new MapToOutTask(in, bit, lo, mid); //0, 1 // 0, 1
+	            MapToOutTask right = new MapToOutTask(in, bit, mid, hi);//1, 2 // 1, 3 -> 1, 2  2, 3
 	            
 	            left.fork();
 	            right.compute();
