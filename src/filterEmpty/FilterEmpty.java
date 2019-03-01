@@ -37,7 +37,7 @@ public class FilterEmpty {
         
         @Override
         protected void compute() {
-            if (hi - lo <= 1) {
+            if (hi - lo <= 0) {
                	if (in[lo].length() > 0) {
                 	out[lo] = 1;
                 } // else, out[i] = 0, by default
