@@ -10,17 +10,19 @@ public class FilterEmpty {
 
     public static int[] filterEmpty(String[] arr) {
         int[] bitset = mapToBitSet(arr);
-        //System.out.println(java.util.Arrays.toString(bitset));
         int[] bitsum = ParallelPrefixSum.parallelPrefixSum(bitset);
-        //System.out.println(java.util.Arrays.toString(bitsum));
         int[] result = mapToOutput(arr, bitsum);
         return result;
     }
 
     public static int[] mapToBitSet(String[] arr) {
-    	int[] bitsum = new int[arr.length];
-        POOL.invoke(new MapToBitTask(arr, bitsum, 0, arr.length));
-        return bitsum;
+    	if (arr.length > 0) { // Make sure not an empty array or we get boned :(
+	    	int[] bitsum = new int[arr.length];
+	        POOL.invoke(new MapToBitTask(arr, bitsum, 0, arr.length));
+	        return bitsum;
+    	} else {
+    		return new int[0];
+    	}
     }
     
     @SuppressWarnings("serial")
@@ -37,27 +39,29 @@ public class FilterEmpty {
         
         @Override
         protected void compute() {
-            if (hi - lo <= 1) {
-               	if (in[lo].length() > 0) {
-                	out[lo] = 1;
-                } // else, out[i] = 0, by default
-            } else {
-	            int mid = lo + (hi - lo) / 2;
-	
-	            MapToBitTask left = new MapToBitTask(in, out, lo, mid);
-	            MapToBitTask right = new MapToBitTask(in, out, mid, hi);
-	            
-	            left.fork();
-	            right.compute();
-	            left.join();
-            }
+        	if (hi - lo <= 1) {
+        		if (in[lo].length() > 0) {
+        			out[lo] = 1;
+	            } // else, out[i] = 0, by default
+	        } else {
+	        	int mid = lo + (hi - lo) / 2;
+		        MapToBitTask left = new MapToBitTask(in, out, lo, mid);
+		        MapToBitTask right = new MapToBitTask(in, out, mid, hi);
+		        left.fork();
+		        right.compute();
+		        left.join();
+	        }
         }
     }
     
     public static int[] mapToOutput(String[] input, int[] bitsum) {
-        int[] out = new int[bitsum[bitsum.length - 1]];
-        POOL.invoke(new MapToOutTask(input, bitsum, 0, input.length));
-        return out;
+    	if (input.length > 0) { // Make sure it's not an empty array or get boned.  :(
+	        int[] out = new int[bitsum[bitsum.length - 1]];
+	        POOL.invoke(new MapToOutTask(input, bitsum, out, 0, input.length));
+	        return out;
+    	} else {
+    		return new int[0];
+    	}
     }
     
     @SuppressWarnings("serial")
@@ -65,11 +69,12 @@ public class FilterEmpty {
         int[] out; String[] in; int[] bit;
         int lo, hi;
         
-        public MapToOutTask(String[] in, int[] bit, int lo, int hi) {
+        public MapToOutTask(String[] in, int[] bit, int[] out, int lo, int hi) {
             this.in = in;
             this.lo = lo;
             this.hi = hi;
             this.bit = bit;
+            this.out = out;
         }
         
         @Override
@@ -78,14 +83,12 @@ public class FilterEmpty {
                 if (lo == 0 && bit[lo] != 0) {
                 	out[lo] = in[lo].length();
                 } else if (lo > 0 && bit[lo] - bit[lo - 1] != 0) {
-                	out[lo] = in[lo].length();
+                	out[bit[lo] - 1] = in[lo].length();
                 }
             } else {
 	            int mid = lo + (hi - lo) / 2;
-	
-	            MapToOutTask left = new MapToOutTask(in, bit, lo, mid); //0, 1 // 0, 1
-	            MapToOutTask right = new MapToOutTask(in, bit, mid, hi);//1, 2 // 1, 3 -> 1, 2  2, 3
-	            
+	            MapToOutTask left = new MapToOutTask(in, bit, out, lo, mid);
+	            MapToOutTask right = new MapToOutTask(in, bit, out, mid, hi);
 	            left.fork();
 	            right.compute();
 	            left.join();
