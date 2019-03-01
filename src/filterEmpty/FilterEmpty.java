@@ -13,8 +13,8 @@ public class FilterEmpty {
         //System.out.println(java.util.Arrays.toString(bitset));
         int[] bitsum = ParallelPrefixSum.parallelPrefixSum(bitset);
         //System.out.println(java.util.Arrays.toString(bitsum));
-        //int[] result = mapToOutput(arr, bitsum);
-        return bitset;
+        int[] result = mapToOutput(arr, bitsum);
+        return result;
     }
 
     public static int[] mapToBitSet(String[] arr) {
@@ -41,16 +41,16 @@ public class FilterEmpty {
                	if (in[lo].length() > 0) {
                 	out[lo] = 1;
                 } // else, out[i] = 0, by default
+            } else {
+	            int mid = lo + (hi - lo) / 2;
+	
+	            MapToBitTask left = new MapToBitTask(in, out, lo, mid);
+	            MapToBitTask right = new MapToBitTask(in, out, mid, hi);
+	            
+	            left.fork();
+	            right.compute();
+	            left.join();
             }
-
-            int mid = lo + (hi - lo) / 2;
-
-            MapToBitTask left = new MapToBitTask(in, out, lo, mid);
-            MapToBitTask right = new MapToBitTask(in, out, mid, hi);
-            
-            left.fork();
-            right.compute();
-            left.join();
         }
     }
     
@@ -80,19 +80,17 @@ public class FilterEmpty {
                	} else if (lo > 0 && bit[hi] - bit[lo] > 0) {
                		out[lo] = in[lo].length();
                	}
+            } else {
+	            int mid = lo + (hi - lo) / 2;
+	
+	            MapToOutTask left = new MapToOutTask(in, bit, lo, mid);
+	            MapToOutTask right = new MapToOutTask(in, bit, mid, hi);
+	            
+	            left.fork();
+	            right.compute();
+	            left.join();
             }
-
-            int mid = lo + (hi - lo) / 2;
-
-            MapToOutTask left = new MapToOutTask(in, bit, lo, mid);
-            MapToOutTask right = new MapToOutTask(in, bit, mid, hi);
-            
-            left.fork();
-            right.compute();
-            left.join();
-
         }
-        
     }
 
     private static void usage() {
