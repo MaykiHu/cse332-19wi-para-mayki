@@ -36,7 +36,7 @@ public class FilterEmpty {
         
         @Override
         protected int[] compute() {
-            if (hi - lo <= 0) {
+            if (hi - lo <= 1) {
                 for (int i = lo; i < hi; i++) {
                 	if (in[i].length() > 0) {
                 		out[i] = 1;
@@ -78,7 +78,7 @@ public class FilterEmpty {
         
         @Override
         protected int[] compute() {
-            if (hi - lo <= 0) {
+            if (hi - lo <= 2) {
                 for (int i = lo + 1; i < hi; i++) {
                 	if (bit[i] - bit[i - 1] > 0) {
                 		out[i] = in[i - 1].length();
