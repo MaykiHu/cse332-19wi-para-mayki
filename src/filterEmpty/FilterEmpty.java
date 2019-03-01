@@ -60,7 +60,7 @@ public class FilterEmpty {
     }
     
     public static int[] mapToOutput(String[] input, int[] bitsum) {
-        POOL.invoke(new MapToOutTask(input, bitsum, new int[bitsum[bitsum.length - 1]], 0, bitsum.length));
+        return POOL.invoke(new MapToOutTask(input, bitsum, new int[bitsum[bitsum.length - 1]], 0, bitsum.length));
     }
     
     @SuppressWarnings("serial")
