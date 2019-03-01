@@ -37,12 +37,10 @@ public class FilterEmpty {
         
         @Override
         protected void compute() {
-            if (hi - lo <= 1) {
-                for (int i = lo; i < hi; i++) {
-                	if (in[i].length() > 0) {
-                		out[i] = 1;
-                	} // else, out[i] = 0, by default
-                }
+            if (hi - lo == 0) {
+               	if (in[lo].length() > 0) {
+                	out[lo] = 1;
+                } // else, out[i] = 0, by default
             }
 
             int mid = lo + (hi - lo) / 2;
@@ -76,14 +74,12 @@ public class FilterEmpty {
         
         @Override
         protected void compute() {
-            if (hi - lo <= 2) {
-                for (int i = lo; i < hi; i++) {
-                	if (i == 0 && bit[i] != 0) {
-                		out[i] = in[i].length(); 
-                	} else if (i > 0 && bit[i] - bit[i - 1] > 0) {
-                		out[i] = in[i].length();
-                	}
-                }
+            if (hi - lo <= 1) {
+                if (lo == 0 && bit[lo] != 0) {
+                	out[lo] = in[lo].length(); 
+               	} else if (lo > 0 && bit[hi] - bit[lo] > 0) {
+               		out[lo] = in[lo].length();
+               	}
             }
 
             int mid = lo + (hi - lo) / 2;
