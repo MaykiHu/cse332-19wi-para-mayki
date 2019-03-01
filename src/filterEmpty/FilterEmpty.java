@@ -74,7 +74,7 @@ public class FilterEmpty {
         
         @Override
         protected void compute() {
-            if (hi - lo <= 1) {
+            if (hi - lo <= 2) {
                 if (lo == 0 && bit[lo] != 0) {
                 	out[lo] = in[lo].length(); 
                	} else if (lo > 0 && bit[hi] - bit[lo] > 0) {
