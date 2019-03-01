@@ -13,8 +13,8 @@ public class FilterEmpty {
         //System.out.println(java.util.Arrays.toString(bitset));
         int[] bitsum = ParallelPrefixSum.parallelPrefixSum(bitset);
         //System.out.println(java.util.Arrays.toString(bitsum));
-        int[] result = mapToOutput(arr, bitsum);
-        return result;
+        //int[] result = mapToOutput(arr, bitsum);
+        return bitset;
     }
 
     public static int[] mapToBitSet(String[] arr) {
