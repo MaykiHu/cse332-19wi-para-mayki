@@ -40,7 +40,7 @@ public class LongestSequence {
         }
         count = 0;
         for (int i = lo; i < hi; i++) {
-        	if (arr[pos] == val) {
+        	if (arr[i] == val) {
         		count++;
         	} else {
         		longest = Math.max(longest, count);
