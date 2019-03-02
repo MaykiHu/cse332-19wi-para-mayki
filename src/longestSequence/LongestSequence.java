@@ -26,6 +26,7 @@ public class LongestSequence {
         	}
         	pos++;
         }
+        left = Math.max(left, count);
         pos = hi - 1;
         count = 0;
         countEdge = true;
@@ -38,6 +39,7 @@ public class LongestSequence {
         	}
         	pos--;
         }
+        right = Math.max(right, count);
         count = 0;
         for (int i = lo; i < hi; i++) {
         	if (arr[i] == val) {
@@ -47,6 +49,7 @@ public class LongestSequence {
         		count = 0;
         	}
         }
+        longest = Math.max(longest, count);
         return new SequenceRange(left, right, longest, hi - lo);
     }
     
@@ -79,26 +82,22 @@ public class LongestSequence {
             SequenceRange rightSeq = right.compute();
             SequenceRange leftSeq = left.join();
 
-            if (leftSeq.matchingOnRight != 0 || rightSeq.matchingOnLeft != 0) {
-            	int mergeCount = leftSeq.matchingOnRight + rightSeq.matchingOnLeft;
-            	if (mergeCount >= leftSeq.longestRange && mergeCount >= rightSeq.longestRange) {
-            		return new SequenceRange(leftSeq.matchingOnLeft, rightSeq.matchingOnRight, 
-            				mergeCount, leftSeq.sequenceLength + rightSeq.sequenceLength);
-            	} else if (mergeCount >= leftSeq.longestRange) {
-            		return new SequenceRange(leftSeq.matchingOnLeft, rightSeq.matchingOnRight,
-            				rightSeq.longestRange, leftSeq.sequenceLength + rightSeq.sequenceLength);
-            	} else if (mergeCount >= rightSeq.longestRange) {
-            		return new SequenceRange(leftSeq.matchingOnLeft, rightSeq.matchingOnRight,
-            				leftSeq.longestRange, leftSeq.sequenceLength + rightSeq.sequenceLength);
-            	}
-            }
-            if (leftSeq.longestRange >= rightSeq.longestRange) {
-            	return new SequenceRange(leftSeq.matchingOnLeft, rightSeq.matchingOnRight, 
-            			leftSeq.longestRange, leftSeq.sequenceLength + rightSeq.sequenceLength);
-            } else {
-            	return new SequenceRange(leftSeq.matchingOnLeft, rightSeq.matchingOnRight,
-            			rightSeq.longestRange, leftSeq.sequenceLength + rightSeq.sequenceLength);
-            }
+            int newLeft = leftSeq.matchingOnLeft;
+    		int newRight = rightSeq.matchingOnRight;
+    		int middle = leftSeq.matchingOnRight + rightSeq.matchingOnLeft;
+    		int newLength = leftSeq.sequenceLength + rightSeq.sequenceLength;
+    		if (leftSeq.matchingOnLeft == leftSeq.sequenceLength) {
+    			newLeft += rightSeq.matchingOnLeft;
+    		}
+    		if (rightSeq.matchingOnRight == rightSeq.sequenceLength) {
+    			newRight += leftSeq.matchingOnRight;
+    		}
+            int longest = newLeft;
+            longest = Math.max(longest, newRight);
+            longest = Math.max(longest, middle);
+            longest = Math.max(longest, leftSeq.longestRange);
+            longest = Math.max(longest, rightSeq.longestRange);
+            return new SequenceRange(newLeft, newRight, longest, newLength);
         }
         
     }
