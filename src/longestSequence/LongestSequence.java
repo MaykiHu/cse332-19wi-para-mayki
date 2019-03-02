@@ -12,16 +12,40 @@ public class LongestSequence {
 
     public static SequenceRange sequential(int[] arr, int lo, int hi, int val) {
         int count = 0;
+        int left = 0;
+        int right = 0;
         int longest = 0;
-        for (int i = lo; i < hi; i++) {
-            if (arr[i] == val) {
-                count++;
-            } else {
-            	longest = Math.max(longest, count);
-            	count = 0;
-            }
+        boolean countEdge = true;
+        int pos = lo;
+        while (pos < hi && countEdge) {
+        	if (arr[pos] == val) {
+        		count++;
+        	} else {
+        		left = count;
+        		countEdge = false;
+        	}
         }
-        return new SequenceRange(lo, hi, longest, hi - lo);
+        pos = hi - 1;
+        count = 0;
+        countEdge = true;
+        while (pos >= lo && countEdge) {
+        	if (arr[pos] == val) {
+        		count++;
+        	} else {
+        		right = count;
+        		countEdge = false;
+        	}
+        }
+        count = 0;
+        for (int i = lo; i < hi; i++) {
+        	if (arr[pos] == val) {
+        		count++;
+        	} else {
+        		longest = Math.max(longest, count);
+        		count = 0;
+        	}
+        }
+        return new SequenceRange(left, right, longest, hi - lo);
     }
     
     @SuppressWarnings("serial")
@@ -53,40 +77,19 @@ public class LongestSequence {
             SequenceRange rightSeq = right.compute();
             SequenceRange leftSeq = left.join();
 
-            if (leftSeq.matchingOnRight != rightSeq.matchingOnLeft || leftSeq.matchingOnLeft != rightSeq.matchingOnRight) { // Two sequences aren't next to each other
-            	if (leftSeq.longestRange >= rightSeq.longestRange) {
-            		return leftSeq;
-            	} else {
-            		return rightSeq;
+            if (leftSeq.matchingOnRight != 0 && rightSeq.matchingOnLeft != 0) {
+            	int mergeCount = leftSeq.matchingOnRight + rightSeq.matchingOnLeft;
+            	if (mergeCount >= leftSeq.longestRange && mergeCount >= rightSeq.longestRange) {
+            		return new SequenceRange(leftSeq.matchingOnLeft, rightSeq.matchingOnRight, 
+            				mergeCount, leftSeq.sequenceLength + rightSeq.sequenceLength);
             	}
-            } else { // Left and right are sequences right next to each other
-            	if (arr[mid] != val) { // If the middle value of the array is not the value concerned
-            		if (leftSeq.longestRange >= rightSeq.longestRange) {
-                		return leftSeq;
-                	} else {
-                		return rightSeq;
-                	}
-            	} else { // We have to check if the sequence lengths should be added together or not
-            		int leftLongest = leftSeq.longestRange;
-            		int rightLongest = rightSeq.longestRange;
-            		int leftLen = leftSeq.sequenceLength;
-            		int rightLen = rightSeq.sequenceLength;
-            		
-            		if (leftLongest + rightLongest == leftLen + rightLen) { // If both seq only match value
-            			return new SequenceRange(lo, hi, leftLongest + rightLongest, leftLen + rightLen);
-            		} else { // Have to check if the consecutive ones in middle is greater or if left/right seq are
-            			SequenceRange totalSeq = sequential(arr, lo, hi, val);
-            			if (totalSeq.longestRange > leftLongest && totalSeq.longestRange > rightLongest) {
-            				return totalSeq;
-            			} else {
-            				if (leftSeq.longestRange >= rightSeq.longestRange) {
-                        		return leftSeq;
-                        	} else {
-                        		return rightSeq;
-                        	}
-            			}
-            		}
-            	}
+            }
+            if (leftSeq.longestRange >= rightSeq.longestRange) {
+            	return new SequenceRange(leftSeq.matchingOnLeft, rightSeq.matchingOnRight, 
+            			leftSeq.longestRange, leftSeq.sequenceLength + rightSeq.sequenceLength);
+            } else {
+            	return new SequenceRange(leftSeq.matchingOnLeft, rightSeq.matchingOnRight,
+            			rightSeq.longestRange, leftSeq.sequenceLength + rightSeq.sequenceLength);
             }
         }
         
