@@ -24,6 +24,7 @@ public class LongestSequence {
         		left = count;
         		countEdge = false;
         	}
+        	pos++;
         }
         pos = hi - 1;
         count = 0;
@@ -35,6 +36,7 @@ public class LongestSequence {
         		right = count;
         		countEdge = false;
         	}
+        	pos--;
         }
         count = 0;
         for (int i = lo; i < hi; i++) {
