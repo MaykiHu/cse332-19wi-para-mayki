@@ -79,11 +79,17 @@ public class LongestSequence {
             SequenceRange rightSeq = right.compute();
             SequenceRange leftSeq = left.join();
 
-            if (leftSeq.matchingOnRight != 0 && rightSeq.matchingOnLeft != 0) {
+            if (leftSeq.matchingOnRight != 0 || rightSeq.matchingOnLeft != 0) {
             	int mergeCount = leftSeq.matchingOnRight + rightSeq.matchingOnLeft;
             	if (mergeCount >= leftSeq.longestRange && mergeCount >= rightSeq.longestRange) {
             		return new SequenceRange(leftSeq.matchingOnLeft, rightSeq.matchingOnRight, 
             				mergeCount, leftSeq.sequenceLength + rightSeq.sequenceLength);
+            	} else if (mergeCount >= leftSeq.longestRange) {
+            		return new SequenceRange(leftSeq.matchingOnLeft, rightSeq.matchingOnRight,
+            				rightSeq.longestRange, leftSeq.sequenceLength + rightSeq.sequenceLength);
+            	} else if (mergeCount >= rightSeq.longestRange) {
+            		return new SequenceRange(leftSeq.matchingOnLeft, rightSeq.matchingOnRight,
+            				leftSeq.longestRange, leftSeq.sequenceLength + rightSeq.sequenceLength);
             	}
             }
             if (leftSeq.longestRange >= rightSeq.longestRange) {
